@@ -1,0 +1,53 @@
+name: Auto Changeset Creation
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  create-changeset:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Get changes from main or dev branch
+      run: |
+        git fetch origin main:main
+        git fetch origin dev:dev
+        if git diff --quiet main..HEAD; then
+          echo "No changes compared to main"
+        else
+          git diff --name-only main..HEAD > changed-files.txt
+        fi
+
+    - name: Generate changeset if there are changes
+      run: |
+        if [ -s changed-files.txt ]; then
+          echo "Changes detected, generating changeset"
+          npx changeset add --empty
+          git add .changeset
+          git commit -m "Auto-generated changeset based on main branch changes"
+          git push origin ${{ github.head_ref }}
+        else
+          echo "No changes detected, skipping changeset generation"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Add PR comment about changeset
+      uses: peter-evans/create-or-update-comment@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          A changeset has been automatically generated based on the differences from the main branch.
