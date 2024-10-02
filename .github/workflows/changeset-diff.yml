@@ -38,7 +38,7 @@ jobs:
           git config --global user.email "actions@github.com"
           git add .changeset
           git commit -m "Auto-generated changeset based on master branch changes"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin ${{ github.head_ref }}
         else
           echo "No changes detected, skipping changeset generation"
         fi
