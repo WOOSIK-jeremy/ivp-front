@@ -20,14 +20,14 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Get changes from main or dev branch
+    - name: Get changes from master or dev branch
       run: |
-        git fetch origin main:main
+        git fetch origin master:master
         git fetch origin dev:dev
-        if git diff --quiet main..HEAD; then
-          echo "No changes compared to main"
+        if git diff --quiet master..HEAD; then
+          echo "No changes compared to master"
         else
-          git diff --name-only main..HEAD > changed-files.txt
+          git diff --name-only master..HEAD > changed-files.txt
         fi
 
     - name: Generate changeset if there are changes
@@ -36,7 +36,7 @@ jobs:
           echo "Changes detected, generating changeset"
           npx changeset add --empty
           git add .changeset
-          git commit -m "Auto-generated changeset based on main branch changes"
+          git commit -m "Auto-generated changeset based on master branch changes"
           git push origin ${{ github.head_ref }}
         else
           echo "No changes detected, skipping changeset generation"
@@ -50,4 +50,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         issue-number: ${{ github.event.pull_request.number }}
         body: |
-          A changeset has been automatically generated based on the differences from the main branch.
+          A changeset has been automatically generated based on the differences from the master branch.
