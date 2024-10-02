@@ -23,7 +23,6 @@ jobs:
     - name: Get changes from master or dev branch
       run: |
         git fetch origin master:master
-        git fetch origin dev:dev
         if git diff --quiet master..HEAD; then
           echo "No changes compared to master"
         else
