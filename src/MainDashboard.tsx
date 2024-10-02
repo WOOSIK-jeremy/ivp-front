@@ -18,6 +18,7 @@ export default function MainDashboard() {
       'Multichain',
       'Stargate',
       'Connext',
+      'test',
     ],
   };
 
